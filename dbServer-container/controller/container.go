@@ -9,8 +9,10 @@ import (
 )
 
 func GetContainer(w http.ResponseWriter, r *http.Request) {
+	cntrNoHeader := r.Header.Get("cntrNo")
 	db := model.DBConn()
-	rows, err := db.Query("SELECT id, inspEqNo, cntrNo, truckNo FROM Information")
+
+	rows, err := db.Query("SELECT id, inspEqNo, cntrNo, truckNo FROM Information WHERE cntrNo = $1", cntrNoHeader)
 	if util.CheckHttpError(w, err, "Check DB Connection") {
 		return
 	}
@@ -26,6 +28,13 @@ func GetContainer(w http.ResponseWriter, r *http.Request) {
 	}
 	err = rows.Err()
 	if util.CheckHttpError(w, err, "Check DB Rows") {
+		return
+	}
+
+	if len(informations) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"message": "No matching data"}`))
 		return
 	}
 
@@ -65,10 +74,11 @@ func GetContainerSpec(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(specs)
 }
 
-func GetContainerRevuew(w http.ResponseWriter, r *http.Request) {
+func GetContainerReview(w http.ResponseWriter, r *http.Request) {
+	inspNoHeader := r.Header.Get("inspNo")
 	db := model.DBConn()
 
-	rows, err := db.Query("SELECT remarkId, inspRemark, informationId FROM Remarks")
+	rows, err := db.Query("SELECT r.remarkId AS remark_id, r.inspRemark, r.informationId FROM Spec s JOIN Remarks r ON s.id = r.informationId WHERE s.inspNo = $1;", inspNoHeader)
 	if util.CheckHttpError(w, err, "Check DB Connection") {
 		return
 	}
@@ -88,8 +98,20 @@ func GetContainerRevuew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(remarks) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"message": "No Reviews"}`))
+		return
+	}
+
+	jsonResponse, err := json.Marshal(remarks)
+	if util.CheckHttpError(w, err, "Check JSON") {
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(remarks)
+	w.Write(jsonResponse)
 }
 
 func AppendContainerReview(w http.ResponseWriter, r *http.Request) {
