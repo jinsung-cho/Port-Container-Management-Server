@@ -24,7 +24,7 @@ func InitRouter() http.Handler {
 	r.HandleFunc("/container", controller.GetContainer).Methods("GET")
 	r.HandleFunc("/container", controller.GetContainer).Methods("POST")
 	r.HandleFunc("/container/spec", controller.GetContainerSpec).Methods("GET")
-	r.HandleFunc("/container/spec/review", controller.GetContainerRevuew).Methods("GET")
+	r.HandleFunc("/container/spec/review", controller.GetContainerReview).Methods("GET")
 	r.HandleFunc("/container/spec/review", controller.AppendContainerReview).Methods("POST")
 
 	// Security checkpoint routes
