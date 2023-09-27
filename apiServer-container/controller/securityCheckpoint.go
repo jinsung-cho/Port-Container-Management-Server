@@ -7,7 +7,7 @@ import (
 	"server/util"
 )
 
-func GetCheckpoint(w http.ResponseWriter, r *http.Request) {
+func GetAllCheckpoint(w http.ResponseWriter, r *http.Request) {
 	dbServerHost := os.Getenv("DB_SERVER_HOST")
 	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/checkpoint"
@@ -40,7 +40,11 @@ func GetCheckpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetCheckpointState(w http.ResponseWriter, r *http.Request) {
+func CreateCheckpoint(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func GetAllCheckpointState(w http.ResponseWriter, r *http.Request) {
 	dbServerHost := os.Getenv("DB_SERVER_HOST")
 	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/checkpoint/state"
@@ -71,4 +75,8 @@ func GetCheckpointState(w http.ResponseWriter, r *http.Request) {
 	if util.CheckHttpError(w, err, "Check Copying Response") {
 		return
 	}
+}
+
+func CreateCheckpointState(w http.ResponseWriter, r *http.Request) {
+
 }

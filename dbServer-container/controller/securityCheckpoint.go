@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func GetCheckpoint(w http.ResponseWriter, r *http.Request) {
+func GetAllCheckpoint(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
 	rows, err := db.Query("SELECT id, inspEqNo, inspAuto, inspName, inspLoc, inspContact FROM EqOperateInfo")
@@ -34,7 +34,11 @@ func GetCheckpoint(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(eqOperateInfos)
 }
 
-func GetCheckpointState(w http.ResponseWriter, r *http.Request) {
+func CreateCheckpoint(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func GetAllCheckpointState(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
 	rows, err := db.Query("SELECT id, inspEqNo, inspEqStatus FROM EqStateInfo")
@@ -59,4 +63,8 @@ func GetCheckpointState(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(eqStateInfos)
+}
+
+func CreateCheckpointState(w http.ResponseWriter, r *http.Request) {
+
 }
