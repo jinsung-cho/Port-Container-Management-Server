@@ -47,11 +47,49 @@ func GetContainer(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
+func GetAllContainers(w http.ResponseWriter, r *http.Request) {
+	db := model.DBConn()
+
+	rows, err := db.Query("SELECT id, inspEqNo, cntrNo, truckNo FROM Information")
+	if util.CheckHttpError(w, err, "Check DB Connection") {
+		return
+	}
+
+	var informations []Information
+	for rows.Next() {
+		var info Information
+		err = rows.Scan(&info.ID, &info.InspEqNo, &info.CntrNo, &info.TruckNo)
+		if util.CheckHttpError(w, err, "Check DB Scan") {
+			return
+		}
+		informations = append(informations, info)
+	}
+	err = rows.Err()
+	if util.CheckHttpError(w, err, "Check DB Rows") {
+		return
+	}
+
+	if len(informations) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"message": "No matching data"}`))
+		return
+	}
+
+	jsonResponse, err := json.Marshal(informations)
+	if util.CheckHttpError(w, err, "Check JSON") {
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+}
+
 func CreateContainer(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "CreateContainer")
 }
 
-func GetContainerSpec(w http.ResponseWriter, r *http.Request) {
+func GetAllContainerSpec(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
 	rows, err := db.Query("SELECT * FROM Spec")

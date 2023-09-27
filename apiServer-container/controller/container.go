@@ -48,7 +48,44 @@ func GetContainer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetContainerSpec(w http.ResponseWriter, r *http.Request) {
+func GetAllContainers(w http.ResponseWriter, r *http.Request) {
+	dbServerHost := os.Getenv("DB_SERVER_HOST")
+	dbServerPort := os.Getenv("DB_SERVER_PORT")
+	url := "http://" + dbServerHost + ":" + dbServerPort + "/containers"
+
+	req, err := http.NewRequest("GET", url, nil)
+	if util.CheckHttpError(w, err, "Check NewRequest") {
+		return
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if util.CheckHttpError(w, err, "Check Client Do") {
+		return
+	}
+	defer resp.Body.Close()
+
+	for key, values := range resp.Header {
+		for _, value := range values {
+			w.Header().Add(key, value)
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(resp.StatusCode)
+
+	_, err = io.Copy(w, resp.Body)
+	if util.CheckHttpError(w, err, "Check Copying Response") {
+		return
+	}
+}
+
+func CreateContainer(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "CreateContainer")
+}
+
+func GetAllContainerSpec(w http.ResponseWriter, r *http.Request) {
 	dbServerHost := os.Getenv("DB_SERVER_HOST")
 	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/container/spec"
