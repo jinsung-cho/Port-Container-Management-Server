@@ -1,3 +1,4 @@
 .env
 *.json
-material-kit-react/
+node_modules/
+.next/
