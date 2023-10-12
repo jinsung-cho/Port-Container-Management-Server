@@ -12,15 +12,15 @@ func GetContainer(w http.ResponseWriter, r *http.Request) {
 	cntrNoHeader := r.Header.Get("cntrNo")
 	db := model.DBConn()
 
-	rows, err := db.Query("SELECT id, inspEqNo, cntrNo, truckNo FROM Information WHERE cntrNo = $1", cntrNoHeader)
+	rows, err := db.Query("SELECT id, inspEqNo, cntrNo, truckNo, typeNo, qDate FROM PreInformation WHERE cntrNo = $1", cntrNoHeader)
 	if util.CheckHttpError(w, err, "Check DB Connection") {
 		return
 	}
 
-	var informations []Information
+	var informations []PreInformation
 	for rows.Next() {
-		var info Information
-		err = rows.Scan(&info.ID, &info.InspEqNo, &info.CntrNo, &info.TruckNo)
+		var info PreInformation
+		err = rows.Scan(&info.ID, &info.InspEqNo, &info.CntrNo, &info.TruckNo, &info.TypeNo, &info.QDate)
 		if util.CheckHttpError(w, err, "Check DB Scan") {
 			return
 		}
@@ -50,15 +50,15 @@ func GetContainer(w http.ResponseWriter, r *http.Request) {
 func GetAllContainers(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
-	rows, err := db.Query("SELECT id, inspEqNo, cntrNo, truckNo FROM Information")
+	rows, err := db.Query("SELECT id, inspEqNo, cntrNo, truckNo, typeNo, qDate FROM PreInformation")
 	if util.CheckHttpError(w, err, "Check DB Connection") {
 		return
 	}
 
-	var informations []Information
+	var informations []PreInformation
 	for rows.Next() {
-		var info Information
-		err = rows.Scan(&info.ID, &info.InspEqNo, &info.CntrNo, &info.TruckNo)
+		var info PreInformation
+		err = rows.Scan(&info.ID, &info.InspEqNo, &info.CntrNo, &info.TruckNo, &info.TypeNo, &info.QDate)
 		if util.CheckHttpError(w, err, "Check DB Scan") {
 			return
 		}
@@ -86,22 +86,41 @@ func GetAllContainers(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateContainer(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "CreateContainer")
+	db := model.DBConn()
+
+	var spec ContainerSpec
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&spec)
+	if util.CheckHttpError(w, err, "Decoding JSON error") {
+		return
+	}
+
+	query := `
+		INSERT INTO ContainerSpec 
+		(inspEqNo, inspNo, inspStartTime, inspEndTime, pckMatch, inspRsltCD, detectionCnt, faultCD, inspRsltImgDir, qDate) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`
+	err = db.QueryRow(query, spec.InspEqNo, spec.InspNo, spec.InspStartTime, spec.InspEndTime, spec.PckMatch, spec.InspRsltCD, spec.DetectionCnt, spec.FaultCD, spec.InspRsltImgDir, spec.QDate).Scan(&spec.ID)
+	if util.CheckHttpError(w, err, "Save DB error") {
+		fmt.Println(err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func GetAllContainerSpec(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
-	rows, err := db.Query("SELECT * FROM Spec")
+	rows, err := db.Query("SELECT * FROM ContainerSpec")
 	if util.CheckHttpError(w, err, "Check DB Connection") {
 		return
 	}
 	defer rows.Close()
 
-	var specs []Spec
+	var specs []ContainerSpec
 	for rows.Next() {
-		var spec Spec
-		err = rows.Scan(&spec.ID, &spec.InspEqNo, &spec.InspNo, &spec.InspStartTime, &spec.InspEndTime, &spec.PckMatch, &spec.InspRsltCD, &spec.DetectionCnt, &spec.FaultCD, &spec.InspRsltImgDir)
+		var spec ContainerSpec
+		err = rows.Scan(&spec.ID, &spec.InspEqNo, &spec.InspNo, &spec.InspStartTime, &spec.InspEndTime, &spec.PckMatch, &spec.InspRsltCD, &spec.DetectionCnt, &spec.FaultCD, &spec.InspRsltImgDir, &spec.QDate)
 		if util.CheckHttpError(w, err, "Check DB Scan") {
 			return
 		}
@@ -110,48 +129,4 @@ func GetAllContainerSpec(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(specs)
-}
-
-func GetContainerReview(w http.ResponseWriter, r *http.Request) {
-	inspNoHeader := r.Header.Get("inspNo")
-	db := model.DBConn()
-
-	rows, err := db.Query("SELECT r.remarkId AS remark_id, r.inspRemark, r.informationId FROM Spec s JOIN Remarks r ON s.id = r.informationId WHERE s.inspNo = $1;", inspNoHeader)
-	if util.CheckHttpError(w, err, "Check DB Connection") {
-		return
-	}
-	defer rows.Close()
-
-	var remarks []Remark
-	for rows.Next() {
-		var r Remark
-		err = rows.Scan(&r.RemarkID, &r.InspRemark, &r.InformationID)
-		if util.CheckHttpError(w, err, "Check DB Scan") {
-			return
-		}
-		remarks = append(remarks, r)
-	}
-	err = rows.Err()
-	if util.CheckHttpError(w, err, "Check DB rows") {
-		return
-	}
-
-	if len(remarks) == 0 {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"message": "No Reviews"}`))
-		return
-	}
-
-	jsonResponse, err := json.Marshal(remarks)
-	if util.CheckHttpError(w, err, "Check JSON") {
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
-}
-
-func AppendContainerReview(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "AppendContainerReview")
 }

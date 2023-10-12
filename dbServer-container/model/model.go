@@ -24,18 +24,32 @@ func InitDB() {
 	db, err = sql.Open("postgres", psqlInfo)
 	util.CheckRuntimeError(err, "db open err")
 
-	createInformationTableQuery := `
-	CREATE TABLE IF NOT EXISTS Information (
+	createPreInformationTableQuery := `
+	CREATE TABLE IF NOT EXISTS PreInformation (
 		id SERIAL PRIMARY KEY,
 		inspEqNo VARCHAR(20) NOT NULL,
 		cntrNo VARCHAR(11) NOT NULL,
-		truckNo VARCHAR(8) NOT NULL
+		truckNo VARCHAR(8) NOT NULL,
+		typeNo VARCHAR(10),
+		qDate DATE
 	);`
-	_, err = db.Exec(createInformationTableQuery)
+	_, err = db.Exec(createPreInformationTableQuery)
 	util.CheckRuntimeError(err, "Information db create err")
 
-	createSpecTableQuery := `
-	CREATE TABLE IF NOT EXISTS Spec (
+	createPreInformationHistoryTableQuery := `
+	CREATE TABLE IF NOT EXISTS PreInformationHistory (
+		id SERIAL PRIMARY KEY,
+		inspEqNo VARCHAR(20) NOT NULL,
+		cntrNo VARCHAR(11) NOT NULL,
+		truckNo VARCHAR(8) NOT NULL,
+		typeNo VARCHAR(10),
+		qDate DATE
+	);`
+	_, err = db.Exec(createPreInformationHistoryTableQuery)
+	util.CheckRuntimeError(err, "Information db create err")
+
+	createContainerSpecTableQuery := `
+	CREATE TABLE IF NOT EXISTS ContainerSpec (
 		id SERIAL PRIMARY KEY,
 		inspEqNo VARCHAR(20) NOT NULL,
 		inspNo VARCHAR(19) NOT NULL,
@@ -45,43 +59,47 @@ func InitDB() {
 		inspRsltCD VARCHAR(2),
 		detectionCnt VARCHAR(3),
 		faultCD VARCHAR(1000),
-		inspRsltImgDir VARCHAR(1000)
+		inspRsltImgDir VARCHAR(1000),
+		qDate DATE
 	);
 	`
-	_, err = db.Exec(createSpecTableQuery)
+	_, err = db.Exec(createContainerSpecTableQuery)
 	util.CheckRuntimeError(err, "Spec db create err")
 
 	createRemarksTableQuery := `
 	CREATE TABLE IF NOT EXISTS Remarks (
 		remarkId SERIAL PRIMARY KEY,
 		inspRemark VARCHAR(1000),
-		informationId INT REFERENCES Information(id)
+		informationId INT REFERENCES PreInformation(id),
+		qDate DATE
 	);
 	`
 	_, err = db.Exec(createRemarksTableQuery)
 	util.CheckRuntimeError(err, "Remarks db create err")
 
-	createEqOperateInfoTableQuery := `
-	CREATE TABLE IF NOT EXISTS EqOperateInfo (
+	createEqInformationTableQuery := `
+	CREATE TABLE IF NOT EXISTS EqInformation (
 		id SERIAL PRIMARY KEY,
 		inspEqNo VARCHAR(20) NOT NULL,
 		inspAuto VARCHAR(1) NOT NULL,
 		inspName VARCHAR(200),
 		inspLoc VARCHAR(200),
-		inspContact VARCHAR(20)
+		inspContact VARCHAR(20),
+		qDate DATE
 	);
 	`
-	_, err = db.Exec(createEqOperateInfoTableQuery)
+	_, err = db.Exec(createEqInformationTableQuery)
 	util.CheckRuntimeError(err, "EqOperateInfo db create err")
 
-	createEqStateInfoTableQuery := `
-	CREATE TABLE IF NOT EXISTS EqStateInfo (
+	createEqStateTableQuery := `
+	CREATE TABLE IF NOT EXISTS EqState (
 		id SERIAL PRIMARY KEY,
 		inspEqNo VARCHAR(20) NOT NULL,
-		inspEqStatus VARCHAR(1) NOT NULL
+		inspEqStatus VARCHAR(1) NOT NULL,
+		qDate DATE
 	);
 	`
-	_, err = db.Exec(createEqStateInfoTableQuery)
+	_, err = db.Exec(createEqStateTableQuery)
 	util.CheckRuntimeError(err, "EqStateInfo db create err")
 }
 

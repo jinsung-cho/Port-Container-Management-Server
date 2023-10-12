@@ -10,16 +10,16 @@ import (
 func GetAllCheckpoint(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
-	rows, err := db.Query("SELECT id, inspEqNo, inspAuto, inspName, inspLoc, inspContact FROM EqOperateInfo")
+	rows, err := db.Query("SELECT id, inspEqNo, inspAuto, inspName, inspLoc, inspContact, qDate FROM EqInformation")
 	if util.CheckHttpError(w, err, "Check DB Connection") {
 		return
 	}
 	defer rows.Close()
 
-	var eqOperateInfos []EqOperateInfo
+	var eqOperateInfos []EqInformation
 	for rows.Next() {
-		var eoi EqOperateInfo
-		err = rows.Scan(&eoi.ID, &eoi.InspEqNo, &eoi.InspAuto, &eoi.InspName, &eoi.InspLoc, &eoi.InspContact)
+		var eoi EqInformation
+		err = rows.Scan(&eoi.ID, &eoi.InspEqNo, &eoi.InspAuto, &eoi.InspName, &eoi.InspLoc, &eoi.InspContact, &eoi.QDate)
 		if util.CheckHttpError(w, err, "Check DB Scan") {
 			return
 		}
@@ -41,16 +41,16 @@ func CreateCheckpoint(w http.ResponseWriter, r *http.Request) {
 func GetAllCheckpointState(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
-	rows, err := db.Query("SELECT id, inspEqNo, inspEqStatus FROM EqStateInfo")
+	rows, err := db.Query("SELECT id, inspEqNo, inspEqStatus, qDate FROM EqStateInfo")
 	if util.CheckHttpError(w, err, "Check DB Connection") {
 		return
 	}
 	defer rows.Close()
 
-	var eqStateInfos []EqStateInfo
+	var eqStateInfos []EqState
 	for rows.Next() {
-		var esi EqStateInfo
-		err = rows.Scan(&esi.ID, &esi.InspEqNo, &esi.InspEqStatus)
+		var esi EqState
+		err = rows.Scan(&esi.ID, &esi.InspEqNo, &esi.InspEqStatus, &esi.QDate)
 		if util.CheckHttpError(w, err, "Check DB Scan") {
 			return
 		}
