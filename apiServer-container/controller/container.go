@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -82,7 +81,28 @@ func GetAllContainers(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateContainer(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "CreateContainer")
+	dbServerHost := os.Getenv("DB_SERVER_HOST")
+	dbServerPort := os.Getenv("DB_SERVER_PORT")
+	url := "http://" + dbServerHost + ":" + dbServerPort + "/container"
+
+	req, err := http.NewRequest("POST", url, r.Body)
+	if util.CheckHttpError(w, err, "Check NewRequest") {
+		return
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if util.CheckHttpError(w, err, "Check Client Do") {
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusCreated {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Success"))
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Failed to save data on remote server"))
+	}
 }
 
 func GetAllContainerSpec(w http.ResponseWriter, r *http.Request) {
@@ -94,46 +114,6 @@ func GetAllContainerSpec(w http.ResponseWriter, r *http.Request) {
 	if util.CheckHttpError(w, err, "Check NewRequest") {
 		return
 	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if util.CheckHttpError(w, err, "Check Client Do") {
-		return
-	}
-	defer resp.Body.Close()
-
-	for key, values := range resp.Header {
-		for _, value := range values {
-			w.Header().Add(key, value)
-		}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	w.WriteHeader(resp.StatusCode)
-
-	_, err = io.Copy(w, resp.Body)
-	if util.CheckHttpError(w, err, "Check Copying Response") {
-		return
-	}
-}
-
-func AppendContainerReview(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "AppendContainerReview")
-}
-
-func GetContainerReview(w http.ResponseWriter, r *http.Request) {
-	inspNoHeader := r.Header.Get("inspNo")
-	dbServerHost := os.Getenv("DB_SERVER_HOST")
-	dbServerPort := os.Getenv("DB_SERVER_PORT")
-	url := "http://" + dbServerHost + ":" + dbServerPort + "/container/spec/review"
-
-	req, err := http.NewRequest("GET", url, nil)
-	if util.CheckHttpError(w, err, "Check NewRequest") {
-		return
-	}
-
-	req.Header.Set("inspNo", inspNoHeader)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
