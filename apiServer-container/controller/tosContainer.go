@@ -2,37 +2,31 @@ package controller
 
 import (
 	"bytes"
-	"db-server/util"
 	"io"
 	"net/http"
 	"os"
+	"server/util"
 )
 
 func GetTosContainer(w http.ResponseWriter, r *http.Request) {
-	tosIp := os.Getenv("TOS_IP")
-	tosPort := os.Getenv("TOS_PORT")
-	tosPath := os.Getenv("TOS_PATH")
-	url := "http://" + tosIp + ":" + tosPort + "/" + tosPath
+	dbServerHost := os.Getenv("DB_SERVER_HOST")
+	dbServerPort := os.Getenv("DB_SERVER_PORT")
+	url := "http://" + dbServerHost + ":" + dbServerPort + "/container/tos"
 
 	bodyBytes, err := io.ReadAll(r.Body)
 	if util.CheckHttpError(w, err, "Reading body") {
 		return
 	}
 	bodyReader := bytes.NewBuffer(bodyBytes)
-
 	req, err := http.NewRequest("POST", url, bodyReader)
+
 	if util.CheckHttpError(w, err, "Check NewRequest") {
 		return
-	}
-	req.Header.Set("Content-Type", "application/json")
-	for key, values := range r.Header {
-		for _, value := range values {
-			req.Header.Add(key, value)
-		}
 	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
+
 	if util.CheckHttpError(w, err, "Check Client Do") {
 		return
 	}
@@ -45,6 +39,7 @@ func GetTosContainer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+
 	w.WriteHeader(resp.StatusCode)
 
 	_, err = io.Copy(w, resp.Body)
