@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 	"os"
@@ -40,10 +41,6 @@ func GetAllCheckpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateCheckpoint(w http.ResponseWriter, r *http.Request) {
-
-}
-
 func GetAllCheckpointState(w http.ResponseWriter, r *http.Request) {
 	dbServerHost := os.Getenv("DB_SERVER_HOST")
 	dbServerPort := os.Getenv("DB_SERVER_PORT")
@@ -78,5 +75,30 @@ func GetAllCheckpointState(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateCheckpointState(w http.ResponseWriter, r *http.Request) {
+	dbServerHost := os.Getenv("DB_SERVER_HOST")
+	dbServerPort := os.Getenv("DB_SERVER_PORT")
+	url := "http://" + dbServerHost + ":" + dbServerPort + "/checkpoint/state"
+	bodyBytes, err := io.ReadAll(r.Body)
+	if util.CheckHttpError(w, err, "Reading body") {
+		return
+	}
+	bodyReader := bytes.NewBuffer(bodyBytes)
+	req, err := http.NewRequest("POST", url, bodyReader)
+	if util.CheckHttpError(w, err, "Check NewRequest") {
+		return
+	}
 
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if util.CheckHttpError(w, err, "Check Client Do") {
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusCreated {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Success"))
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Failed to save data on remote server"))
+	}
 }

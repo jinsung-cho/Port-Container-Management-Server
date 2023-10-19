@@ -4,6 +4,7 @@ import (
 	"db-server/model"
 	"db-server/util"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -34,10 +35,6 @@ func GetAllCheckpoint(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(eqOperateInfos)
 }
 
-func CreateCheckpoint(w http.ResponseWriter, r *http.Request) {
-
-}
-
 func GetAllCheckpointState(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
@@ -66,5 +63,24 @@ func GetAllCheckpointState(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateCheckpointState(w http.ResponseWriter, r *http.Request) {
+	db := model.DBConn()
 
+	var eqStateInfos EqState
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&eqStateInfos)
+	if util.CheckHttpError(w, err, "Decoding JSON error") {
+		return
+	}
+
+	query := `
+		INSERT INTO EqState 
+		(inspEqNo, inspEqStatus, qDate) 
+		VALUES ($1, $2, $3) RETURNING id`
+	err = db.QueryRow(query, eqStateInfos.InspEqNo, eqStateInfos.InspEqStatus, eqStateInfos.QDate).Scan(&eqStateInfos.ID)
+	if util.CheckHttpError(w, err, "Save DB error") {
+		fmt.Println(err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }
