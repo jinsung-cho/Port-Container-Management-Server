@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"db-server/model"
 	"db-server/util"
 	"encoding/json"
@@ -8,46 +9,47 @@ import (
 	"net/http"
 )
 
-func GetContainer(w http.ResponseWriter, r *http.Request) {
-	cntrNoHeader := r.Header.Get("cntrNo")
+func GetPreContainerInfo(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
-	rows, err := db.Query("SELECT id, inspEqNo, cntrNo, truckNo, typeNo, qDate FROM PreInformation WHERE cntrNo = $1", cntrNoHeader)
-	if util.CheckHttpError(w, err, "Check DB Connection") {
+	var inputInfo PreInformation
+	err := json.NewDecoder(r.Body).Decode(&inputInfo)
+	if util.CheckHttpError(w, err, "Failed to decode the request body") {
 		return
 	}
 
-	var informations []PreInformation
-	for rows.Next() {
-		var info PreInformation
-		err = rows.Scan(&info.ID, &info.InspEqNo, &info.CntrNo, &info.TruckNo, &info.TypeNo, &info.QDate)
-		if util.CheckHttpError(w, err, "Check DB Scan") {
-			return
-		}
-		informations = append(informations, info)
+	if inputInfo.TruckNo == "" {
+		inputInfo.TruckNo = ""
 	}
-	err = rows.Err()
-	if util.CheckHttpError(w, err, "Check DB Rows") {
-		return
+	if inputInfo.TypeNo == "" {
+		inputInfo.TypeNo = ""
 	}
 
-	if len(informations) == 0 {
+	var exist int
+	err = db.QueryRow("SELECT id FROM PreInformation WHERE inspEqNo = $1 AND cntrNo = $2 AND truckNo = $3 AND typeNo = $4 AND qDate = $5",
+		inputInfo.InspEqNo, inputInfo.CntrNo, inputInfo.TruckNo, inputInfo.TypeNo, inputInfo.QDate).Scan(&exist)
+
+	if err == sql.ErrNoRows {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{"message": "No matching data"}`))
 		return
+	} else if err != nil {
+		util.CheckHttpError(w, err, "Error querying the database")
+		return
 	}
 
-	jsonResponse, err := json.Marshal(informations)
-	if util.CheckHttpError(w, err, "Check JSON") {
+	_, err = db.Exec("INSERT INTO PreInformationHistory (inspEqNo, cntrNo, truckNo, typeNo, qDate) VALUES ($1, $2, $3, $4, $5)",
+		inputInfo.InspEqNo, inputInfo.CntrNo, inputInfo.TruckNo, inputInfo.TypeNo, inputInfo.QDate)
+	if util.CheckHttpError(w, err, "Failed to insert data") {
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	w.Write([]byte(`{"message": "Data exists"}`))
 }
 
-func GetAllContainers(w http.ResponseWriter, r *http.Request) {
+func GetAllPreContainersInfo(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
 	rows, err := db.Query("SELECT id, inspEqNo, cntrNo, truckNo, typeNo, qDate FROM PreInformation")
@@ -72,7 +74,7 @@ func GetAllContainers(w http.ResponseWriter, r *http.Request) {
 	if len(informations) == 0 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(`{"message": "No matching data"}`))
+		w.Write([]byte(`{"message": "not exist data"}`))
 		return
 	}
 
@@ -85,7 +87,7 @@ func GetAllContainers(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
-func CreateContainer(w http.ResponseWriter, r *http.Request) {
+func CreateContainerSpec(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
 	var spec ContainerSpec

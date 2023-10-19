@@ -12,7 +12,7 @@ func GetContainerReview(w http.ResponseWriter, r *http.Request) {
 	inspNoHeader := r.Header.Get("inspNo")
 	db := model.DBConn()
 
-	rows, err := db.Query("SELECT r.remarkId AS remark_id, r.inspRemark, r.informationId, r.qDate FROM PreInformation s JOIN Remarks r ON s.id = r.informationId WHERE s.inspNo = $1;", inspNoHeader)
+	rows, err := db.Query("SELECT r.remarkId AS remark_id, r.inspRemark, r.informationId, r.qDate FROM ContainerSpec s JOIN Remarks r ON s.id = r.informationId WHERE s.inspNo = $1;", inspNoHeader)
 	if util.CheckHttpError(w, err, "Check DB Connection") {
 		return
 	}

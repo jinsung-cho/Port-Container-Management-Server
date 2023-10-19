@@ -1,28 +1,27 @@
 package controller
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 	"os"
 	"server/util"
 )
 
-func GetContainer(w http.ResponseWriter, r *http.Request) {
-	cntrNoHeader := r.Header.Get("cntrNo")
-	if cntrNoHeader == "" {
-		http.Error(w, "cntrNo and truckNo headers are required", http.StatusBadRequest)
-		return
-	}
+func GetPreContainerInfo(w http.ResponseWriter, r *http.Request) {
 	dbServerHost := os.Getenv("DB_SERVER_HOST")
 	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/container"
 
-	req, err := http.NewRequest("GET", url, nil)
+	bodyBytes, err := io.ReadAll(r.Body)
+	if util.CheckHttpError(w, err, "Reading body") {
+		return
+	}
+	bodyReader := bytes.NewBuffer(bodyBytes)
+	req, err := http.NewRequest("POST", url, bodyReader)
 	if util.CheckHttpError(w, err, "Check NewRequest") {
 		return
 	}
-
-	req.Header.Set("cntrNo", cntrNoHeader)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -47,7 +46,7 @@ func GetContainer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetAllContainers(w http.ResponseWriter, r *http.Request) {
+func GetAllPreContainersInfo(w http.ResponseWriter, r *http.Request) {
 	dbServerHost := os.Getenv("DB_SERVER_HOST")
 	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/containers"
@@ -80,12 +79,16 @@ func GetAllContainers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateContainer(w http.ResponseWriter, r *http.Request) {
+func CreateContainerSpec(w http.ResponseWriter, r *http.Request) {
 	dbServerHost := os.Getenv("DB_SERVER_HOST")
 	dbServerPort := os.Getenv("DB_SERVER_PORT")
-	url := "http://" + dbServerHost + ":" + dbServerPort + "/container"
-
-	req, err := http.NewRequest("POST", url, r.Body)
+	url := "http://" + dbServerHost + ":" + dbServerPort + "/container/spec"
+	bodyBytes, err := io.ReadAll(r.Body)
+	if util.CheckHttpError(w, err, "Reading body") {
+		return
+	}
+	bodyReader := bytes.NewBuffer(bodyBytes)
+	req, err := http.NewRequest("POST", url, bodyReader)
 	if util.CheckHttpError(w, err, "Check NewRequest") {
 		return
 	}

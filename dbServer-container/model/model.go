@@ -13,7 +13,7 @@ var db *sql.DB
 
 func InitDB() {
 	host := os.Getenv("POSTGRES_HOST")
-	port := os.Getenv("POSTGRES_PORT") // strconv.Atoi(os.Getenv("POSTGRES_PORT"))
+	port := os.Getenv("POSTGRES_PORT")
 	user := os.Getenv("POSTGRES_USER")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DBNAME")
@@ -29,8 +29,8 @@ func InitDB() {
 		id SERIAL PRIMARY KEY,
 		inspEqNo VARCHAR(20) NOT NULL,
 		cntrNo VARCHAR(11) NOT NULL,
-		truckNo VARCHAR(8) NOT NULL,
-		typeNo VARCHAR(10),
+		truckNo VARCHAR(8),
+		typeNo VARCHAR(20),
 		qDate DATE
 	);`
 	_, err = db.Exec(createPreInformationTableQuery)
@@ -41,8 +41,8 @@ func InitDB() {
 		id SERIAL PRIMARY KEY,
 		inspEqNo VARCHAR(20) NOT NULL,
 		cntrNo VARCHAR(11) NOT NULL,
-		truckNo VARCHAR(8) NOT NULL,
-		typeNo VARCHAR(10),
+		truckNo VARCHAR(8),
+		typeNo VARCHAR(20),
 		qDate DATE
 	);`
 	_, err = db.Exec(createPreInformationHistoryTableQuery)
@@ -70,7 +70,7 @@ func InitDB() {
 	CREATE TABLE IF NOT EXISTS Remarks (
 		remarkId SERIAL PRIMARY KEY,
 		inspRemark VARCHAR(1000),
-		informationId INT REFERENCES PreInformation(id),
+		informationId INT REFERENCES ContainerSpec(id),
 		qDate DATE
 	);
 	`
