@@ -1,4 +1,7 @@
 import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+
+import React from 'react';
 import {
   Card,
   Box,
@@ -13,6 +16,28 @@ import { Scrollbar } from 'src/components/scrollbar';
 
 export const CheckpointState = (props) => {
   const { items = [] } = props;
+  const [selectedEqNo, setSelectedEqNo] = useState(null);
+
+  const sortedItems = items.sort((a, b) => b.id - a.id);
+  const uniqueItemsMap = new Map();
+  sortedItems.forEach(item => {
+    if (!uniqueItemsMap.has(item.inspeqno)) {
+      uniqueItemsMap.set(item.inspeqno, item);
+    }
+  });
+
+  const uniqueItems = Array.from(uniqueItemsMap.values());
+
+  const handleRowClick = (eqNo) => {
+    if (selectedEqNo === eqNo) {
+      setSelectedEqNo(null);
+    } else {
+      setSelectedEqNo(eqNo);
+    }
+  };
+
+  const selectedItemDetails = items.filter(item => item.inspeqno === selectedEqNo && item.id !== uniqueItemsMap.get(selectedEqNo).id);
+
 
   const getStatusText = (status) => {
     switch (status) {
@@ -48,6 +73,126 @@ export const CheckpointState = (props) => {
     }
   };
 
+  // return (
+  //   <Card>
+  //     <Scrollbar>
+  //       <Box sx={{ minWidth: 800 }}>
+  //         <TableContainer sx={{ maxHeight: 420 }}>
+  //           <Table stickyHeader>
+  //             <TableHead>
+  //               <TableRow>
+  //                 <TableCell>Equipment No</TableCell>
+  //                 <TableCell>Equipment Status</TableCell>
+  //                 <TableCell>Date</TableCell>
+
+  //               </TableRow>
+  //             </TableHead>
+  //             <TableBody>
+  //               {items.map((item) => (
+  //                 <TableRow key={item.id}>
+  //                   <TableCell>{item.inspeqno}</TableCell>
+  //                   <TableCell>
+  //                     <span
+  //                       style={{
+  //                         backgroundColor: getStatusColor(item.inspeqstatus),
+  //                         padding: '0.2rem 0.5rem',
+  //                         borderRadius: '0.2rem',
+  //                         fontWeight: 'bold',
+  //                         color: 'white'
+  //                       }}
+  //                     >
+  //                       {getStatusText(item.inspeqstatus)}
+  //                     </span>
+  //                   </TableCell>
+  //                   <TableCell>{item.qdate}</TableCell>
+  //                 </TableRow>
+  //               ))}
+  //             </TableBody>
+
+  //           </Table>
+  //         </TableContainer>
+  //       </Box>
+  //     </Scrollbar>
+  //   </Card>
+  // );
+  // return (
+  //   <Card>
+  //     <Scrollbar>
+  //       <Box sx={{ minWidth: 800 }}>
+  //         <TableContainer sx={{ maxHeight: 420 }}>
+  //           <Table stickyHeader>
+  //             <TableHead>
+  //               <TableRow>
+  //                 <TableCell>Equipment No</TableCell>
+  //                 <TableCell>Equipment Status</TableCell>
+  //                 <TableCell>Date</TableCell>
+  //               </TableRow>
+  //             </TableHead>
+  //             <TableBody>
+  //               {uniqueItems.map((item) => (
+  //                 <React.Fragment key={item.id}>
+  //                   <TableRow onClick={() => handleRowClick(item.inspeqno)}>
+  //                     <TableCell>{item.inspeqno}</TableCell>
+  //                     <TableCell>
+  //                       <span
+  //                         style={{
+  //                           backgroundColor: getStatusColor(item.inspeqstatus),
+  //                           padding: '0.2rem 0.5rem',
+  //                           borderRadius: '0.2rem',
+  //                           fontWeight: 'bold',
+  //                           color: 'white'
+  //                         }}
+  //                       >
+  //                         {getStatusText(item.inspeqstatus)}
+  //                       </span>
+  //                     </TableCell>
+  //                     <TableCell>{item.qdate}</TableCell>
+  //                   </TableRow>
+  //                   {selectedEqNo === item.inspeqno && (
+  //                     <TableRow>
+  //                       <TableCell colSpan={3}>
+  //                         <Table>
+  //                           <TableHead>
+  //                             <TableRow>
+  //                               <TableCell>Equipment No</TableCell>
+  //                               <TableCell>Equipment Status</TableCell>
+  //                               <TableCell>Date</TableCell>
+  //                             </TableRow>
+  //                           </TableHead>
+  //                           <TableBody>
+  //                             {selectedItemDetails.map(detail => (
+  //                               <TableRow key={detail.id}>
+  //                                 <TableCell>{detail.inspeqno}</TableCell>
+  //                                 <TableCell>
+  //                                   <span
+  //                                     style={{
+  //                                       backgroundColor: getStatusColor(detail.inspeqstatus),
+  //                                       padding: '0.2rem 0.5rem',
+  //                                       borderRadius: '0.2rem',
+  //                                       fontWeight: 'bold',
+  //                                       color: 'white'
+  //                                     }}
+  //                                   >
+  //                                     {getStatusText(detail.inspeqstatus)}
+  //                                   </span>
+  //                                 </TableCell>
+  //                                 <TableCell>{detail.qdate}</TableCell>
+  //                               </TableRow>
+  //                             ))}
+  //                           </TableBody>
+  //                         </Table>
+  //                       </TableCell>
+  //                     </TableRow>
+  //                   )}
+  //                 </React.Fragment>
+  //               ))}
+  //             </TableBody>
+  //           </Table>
+  //         </TableContainer>
+  //       </Box>
+  //     </Scrollbar>
+  //   </Card>
+  // );
   return (
     <Card>
       <Scrollbar>
@@ -59,31 +204,67 @@ export const CheckpointState = (props) => {
                   <TableCell>Equipment No</TableCell>
                   <TableCell>Equipment Status</TableCell>
                   <TableCell>Date</TableCell>
-
                 </TableRow>
               </TableHead>
               <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.inspeqno}</TableCell>
-                    <TableCell>
-                      <span
-                        style={{
-                          backgroundColor: getStatusColor(item.inspeqstatus),
-                          padding: '0.2rem 0.5rem',
-                          borderRadius: '0.2rem',
-                          fontWeight: 'bold',
-                          color: 'white'
-                        }}
-                      >
-                        {getStatusText(item.inspeqstatus)}
-                      </span>
-                    </TableCell>
-                    <TableCell>{item.qdate}</TableCell>
-                  </TableRow>
+                {uniqueItems.map((item) => (
+                  <React.Fragment key={item.id}>
+                    <TableRow onClick={() => handleRowClick(item.inspeqno)}>
+                      <TableCell>{item.inspeqno}</TableCell>
+                      <TableCell>
+                        <span
+                          style={{
+                            backgroundColor: getStatusColor(item.inspeqstatus),
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: '0.2rem',
+                            fontWeight: 'bold',
+                            color: 'white'
+                          }}
+                        >
+                          {getStatusText(item.inspeqstatus)}
+                        </span>
+                      </TableCell>
+                      <TableCell>{item.qdate}</TableCell>
+                    </TableRow>
+                    {selectedEqNo === item.inspeqno && (
+                      <TableRow>
+                        <TableCell colSpan={3}>
+                          <Table>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell>Equipment No</TableCell>
+                                <TableCell>Equipment Status</TableCell>
+                                <TableCell>Date</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {selectedItemDetails.map(detail => (
+                                <TableRow key={detail.id}>
+                                  <TableCell>{detail.inspeqno}</TableCell>
+                                  <TableCell>
+                                    <span
+                                      style={{
+                                        backgroundColor: getStatusColor(detail.inspeqstatus),
+                                        padding: '0.2rem 0.5rem',
+                                        borderRadius: '0.2rem',
+                                        fontWeight: 'bold',
+                                        color: 'white'
+                                      }}
+                                    >
+                                      {getStatusText(detail.inspeqstatus)}
+                                    </span>
+                                  </TableCell>
+                                  <TableCell>{detail.qdate}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
                 ))}
               </TableBody>
-
             </Table>
           </TableContainer>
         </Box>
