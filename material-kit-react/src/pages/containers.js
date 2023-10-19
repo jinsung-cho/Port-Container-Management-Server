@@ -7,16 +7,7 @@ import { ContainerSpec } from 'src/sections/container/container-spec';
 import axiosInstance from "src/axiosInstance";
 
 const Page = () => {
-  const [preInfoData, setPreInfoData] = useState([]);
-  const [specData, setSpecData] = useState([]);
-  useEffect(() => {
-    axiosInstance.get("/preinformation")
-      .then((response) => setPreInfoData(response.data))
-      .catch((error) => console.error('Error fetching data: ', error));
-    axiosInstance.get("/containerspec")
-      .then((response) => setSpecData(response.data))
-      .catch((error) => console.error('Error fetching data: ', error));
-  }, []);
+
   return (
     <>
       <Head>
@@ -29,10 +20,10 @@ const Page = () => {
               <Stack spacing={3}>
                 <Stack direction="row" justifyContent="space-between" spacing={4}>
                   <Stack spacing={1}>
-                    <Typography variant="h4">Pre-Information</Typography>
+                    <Typography variant="h4">검색 사전인식 정보</Typography>
                   </Stack>
                 </Stack>
-                <PreInformation items={preInfoData} />
+                <PreInformation />
               </Stack>
             </Grid>
             <Divider sx={{ my: '10px', height: '5px' }} />
@@ -40,10 +31,10 @@ const Page = () => {
               <Stack spacing={3}>
                 <Stack direction="row" justifyContent="space-between" spacing={4}>
                   <Stack spacing={1}>
-                    <Typography variant="h4">Container Spec</Typography>
+                    <Typography variant="h4">검색 결과 정보</Typography>
                   </Stack>
                 </Stack>
-                <ContainerSpec items={specData} />
+                <ContainerSpec />
               </Stack>
             </Grid>
           </Grid>

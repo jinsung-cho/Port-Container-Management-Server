@@ -30,7 +30,7 @@ const Page = () => {
               <Stack spacing={3}>
                 <Stack direction="row" justifyContent="space-between" spacing={4}>
                   <Stack spacing={1}>
-                    <Typography variant="h4">Checkpoint Information</Typography>
+                    <Typography variant="h4">검색기 운영 정보</Typography>
                   </Stack>
                 </Stack>
                 <CheckpointInfo items={preInfoData} />
@@ -41,7 +41,7 @@ const Page = () => {
               <Stack spacing={3}>
                 <Stack direction="row" justifyContent="space-between" spacing={4}>
                   <Stack spacing={1}>
-                    <Typography variant="h4">Checkpoint State</Typography>
+                    <Typography variant="h4">검색기 상태 정보</Typography>
                   </Stack>
                 </Stack>
                 <CheckpointState items={specData} />
