@@ -4,13 +4,10 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"os"
 	"server/util"
 )
 
 func GetPreContainerInfo(w http.ResponseWriter, r *http.Request) {
-	dbServerHost := os.Getenv("DB_SERVER_HOST")
-	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/container"
 
 	bodyBytes, err := io.ReadAll(r.Body)
@@ -47,8 +44,6 @@ func GetPreContainerInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllPreContainersInfo(w http.ResponseWriter, r *http.Request) {
-	dbServerHost := os.Getenv("DB_SERVER_HOST")
-	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/containers"
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -80,8 +75,6 @@ func GetAllPreContainersInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateContainerSpec(w http.ResponseWriter, r *http.Request) {
-	dbServerHost := os.Getenv("DB_SERVER_HOST")
-	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/container/spec"
 	bodyBytes, err := io.ReadAll(r.Body)
 	if util.CheckHttpError(w, err, "Reading body") {
@@ -109,8 +102,6 @@ func CreateContainerSpec(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllContainerSpec(w http.ResponseWriter, r *http.Request) {
-	dbServerHost := os.Getenv("DB_SERVER_HOST")
-	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/container/spec"
 
 	req, err := http.NewRequest("GET", url, nil)

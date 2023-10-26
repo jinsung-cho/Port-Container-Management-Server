@@ -4,13 +4,10 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"os"
 	"server/util"
 )
 
 func GetTosContainer(w http.ResponseWriter, r *http.Request) {
-	dbServerHost := os.Getenv("DB_SERVER_HOST")
-	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/container/tos"
 
 	bodyBytes, err := io.ReadAll(r.Body)

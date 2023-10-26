@@ -38,7 +38,7 @@ func GetAllCheckpoint(w http.ResponseWriter, r *http.Request) {
 func GetAllCheckpointState(w http.ResponseWriter, r *http.Request) {
 	db := model.DBConn()
 
-	rows, err := db.Query("SELECT id, inspEqNo, inspEqStatus, qDate FROM EqStateInfo")
+	rows, err := db.Query("SELECT id, inspEqNo, inspEqStatus, qDate FROM EqState")
 	if util.CheckHttpError(w, err, "Check DB Connection") {
 		return
 	}

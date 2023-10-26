@@ -15,7 +15,6 @@ func main() {
 	util.CheckRuntimeError(env_err, ".env Load fail")
 
 	model.InitDB()
-	//defer db.Close()
-
-	http.ListenAndServe(":"+os.Getenv("HOST_PORT"), router.InitRouter())
+	err := http.ListenAndServe(":"+os.Getenv("DB_SERVER_PORT"), router.InitRouter())
+	util.CheckRuntimeError(err, "http open err")
 }

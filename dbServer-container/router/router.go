@@ -10,7 +10,7 @@ import (
 )
 
 func InitRouter() http.Handler {
-	hostIP := os.Getenv("HOST_IP")
+	hostIP := os.Getenv("DB_SERVER_HOST")
 
 	r := mux.NewRouter()
 	corsConfig := cors.New(cors.Options{

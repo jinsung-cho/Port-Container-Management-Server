@@ -3,13 +3,10 @@ package controller
 import (
 	"io"
 	"net/http"
-	"os"
 	"server/util"
 )
 
 func AppendContainerReview(w http.ResponseWriter, r *http.Request) {
-	dbServerHost := os.Getenv("DB_SERVER_HOST")
-	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/container/spec/review"
 
 	req, err := http.NewRequest("POST", url, r.Body)
@@ -34,8 +31,6 @@ func AppendContainerReview(w http.ResponseWriter, r *http.Request) {
 
 func GetContainerReview(w http.ResponseWriter, r *http.Request) {
 	inspNoHeader := r.Header.Get("inspNo")
-	dbServerHost := os.Getenv("DB_SERVER_HOST")
-	dbServerPort := os.Getenv("DB_SERVER_PORT")
 	url := "http://" + dbServerHost + ":" + dbServerPort + "/container/spec/review"
 
 	req, err := http.NewRequest("GET", url, nil)

@@ -9,7 +9,7 @@ import (
 )
 
 func GetTosContainer(w http.ResponseWriter, r *http.Request) {
-	tosIp := os.Getenv("TOS_IP")
+	tosIp := os.Getenv("TOS_HOST")
 	tosPort := os.Getenv("TOS_PORT")
 	tosPath := os.Getenv("TOS_PATH")
 	url := "http://" + tosIp + ":" + tosPort + "/" + tosPath

@@ -10,7 +10,7 @@ import (
 )
 
 func InitRouter() http.Handler {
-	hostIP := os.Getenv("HOST_IP")
+	hostIP := os.Getenv("API_SERVER_IP")
 
 	r := mux.NewRouter()
 	corsConfig := cors.New(cors.Options{
@@ -33,6 +33,7 @@ func InitRouter() http.Handler {
 
 	// Security checkpoint routes
 	r.HandleFunc("/checkpoint", controller.GetAllCheckpoint).Methods("GET")
+
 	r.HandleFunc("/checkpoint/state", controller.GetAllCheckpointState).Methods("GET")
 	r.HandleFunc("/checkpoint/state", controller.CreateCheckpointState).Methods("POST")
 
