@@ -48,8 +48,10 @@ export const CheckpointState = (props) => {
       case "2":
         return '검색중';
       case "3":
-        return '검색종료';
+        return '분석중';
       case "4":
+        return '검색종료';
+      case "5":
         return '이상오류';
       default:
         return '알 수 없는 상태';
@@ -65,134 +67,15 @@ export const CheckpointState = (props) => {
       case "2":
         return '#007bff';
       case "3":
-        return '#ffc107';
+        return '#5816db';
       case "4":
+        return '#ffc107';
+      case "5":
         return '#dc3545';
       default:
         return '#6c757d';
     }
   };
-
-  // return (
-  //   <Card>
-  //     <Scrollbar>
-  //       <Box sx={{ minWidth: 800 }}>
-  //         <TableContainer sx={{ maxHeight: 420 }}>
-  //           <Table stickyHeader>
-  //             <TableHead>
-  //               <TableRow>
-  //                 <TableCell>Equipment No</TableCell>
-  //                 <TableCell>Equipment Status</TableCell>
-  //                 <TableCell>Date</TableCell>
-
-  //               </TableRow>
-  //             </TableHead>
-  //             <TableBody>
-  //               {items.map((item) => (
-  //                 <TableRow key={item.id}>
-  //                   <TableCell>{item.inspeqno}</TableCell>
-  //                   <TableCell>
-  //                     <span
-  //                       style={{
-  //                         backgroundColor: getStatusColor(item.inspeqstatus),
-  //                         padding: '0.2rem 0.5rem',
-  //                         borderRadius: '0.2rem',
-  //                         fontWeight: 'bold',
-  //                         color: 'white'
-  //                       }}
-  //                     >
-  //                       {getStatusText(item.inspeqstatus)}
-  //                     </span>
-  //                   </TableCell>
-  //                   <TableCell>{item.qdate}</TableCell>
-  //                 </TableRow>
-  //               ))}
-  //             </TableBody>
-
-  //           </Table>
-  //         </TableContainer>
-  //       </Box>
-  //     </Scrollbar>
-  //   </Card>
-  // );
-  // return (
-  //   <Card>
-  //     <Scrollbar>
-  //       <Box sx={{ minWidth: 800 }}>
-  //         <TableContainer sx={{ maxHeight: 420 }}>
-  //           <Table stickyHeader>
-  //             <TableHead>
-  //               <TableRow>
-  //                 <TableCell>Equipment No</TableCell>
-  //                 <TableCell>Equipment Status</TableCell>
-  //                 <TableCell>Date</TableCell>
-  //               </TableRow>
-  //             </TableHead>
-  //             <TableBody>
-  //               {uniqueItems.map((item) => (
-  //                 <React.Fragment key={item.id}>
-  //                   <TableRow onClick={() => handleRowClick(item.inspeqno)}>
-  //                     <TableCell>{item.inspeqno}</TableCell>
-  //                     <TableCell>
-  //                       <span
-  //                         style={{
-  //                           backgroundColor: getStatusColor(item.inspeqstatus),
-  //                           padding: '0.2rem 0.5rem',
-  //                           borderRadius: '0.2rem',
-  //                           fontWeight: 'bold',
-  //                           color: 'white'
-  //                         }}
-  //                       >
-  //                         {getStatusText(item.inspeqstatus)}
-  //                       </span>
-  //                     </TableCell>
-  //                     <TableCell>{item.qdate}</TableCell>
-  //                   </TableRow>
-  //                   {selectedEqNo === item.inspeqno && (
-  //                     <TableRow>
-  //                       <TableCell colSpan={3}>
-  //                         <Table>
-  //                           <TableHead>
-  //                             <TableRow>
-  //                               <TableCell>Equipment No</TableCell>
-  //                               <TableCell>Equipment Status</TableCell>
-  //                               <TableCell>Date</TableCell>
-  //                             </TableRow>
-  //                           </TableHead>
-  //                           <TableBody>
-  //                             {selectedItemDetails.map(detail => (
-  //                               <TableRow key={detail.id}>
-  //                                 <TableCell>{detail.inspeqno}</TableCell>
-  //                                 <TableCell>
-  //                                   <span
-  //                                     style={{
-  //                                       backgroundColor: getStatusColor(detail.inspeqstatus),
-  //                                       padding: '0.2rem 0.5rem',
-  //                                       borderRadius: '0.2rem',
-  //                                       fontWeight: 'bold',
-  //                                       color: 'white'
-  //                                     }}
-  //                                   >
-  //                                     {getStatusText(detail.inspeqstatus)}
-  //                                   </span>
-  //                                 </TableCell>
-  //                                 <TableCell>{detail.qdate}</TableCell>
-  //                               </TableRow>
-  //                             ))}
-  //                           </TableBody>
-  //                         </Table>
-  //                       </TableCell>
-  //                     </TableRow>
-  //                   )}
-  //                 </React.Fragment>
-  //               ))}
-  //             </TableBody>
-  //           </Table>
-  //         </TableContainer>
-  //       </Box>
-  //     </Scrollbar>
-  //   </Card>
-  // );
   return (
     <Card>
       <Scrollbar>
